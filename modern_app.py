@@ -1,3 +1,5 @@
+import os
+from dotenv import load_dotenv
 import datetime as dt
 import pandas as pd
 import streamlit as st
@@ -8,6 +10,9 @@ from streamlit_extras.colored_header import colored_header
 from streamlit_extras.dataframe_explorer import dataframe_explorer
 from sqlalchemy import create_engine, text
 import humanize
+import pyodbc
+print(pyodbc.drivers())
+
 
 # ── 1. Enhanced Page Configuration ─────────────────────────────────────────
 st.set_page_config(
@@ -104,12 +109,19 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
+load_dotenv()
+
 # ── 3. Database Engine Setup ───────────────────────────────────────────────
-engine = create_engine(
-    "mssql+pyodbc://DESKTOP-3AIVNRS\SQLEXPRESS/project4"
-    "?driver=ODBC+Driver+17+for+SQL+Server"
-    "&trusted_connection=yes"
-)
+server = os.environ["AZURE_SQL_SERVER"]
+database = os.environ["AZURE_SQL_DATABASE"]
+username = os.environ["AZURE_SQL_USERNAME"]
+password = os.environ["AZURE_SQL_PASSWORD"]
+driver = os.environ["AZURE_SQL_DRIVER"].replace(" ", "+")
+
+# SQLAlchemy URL format for Azure SQL
+connection_string = f"mssql+pyodbc://{username}:{password}@{server}:1433/{database}?driver={driver}&Encrypt=yes&TrustServerCertificate=no"
+
+engine = create_engine(connection_string)
 
 
 def run_proc(proc_name: str, params=()):
