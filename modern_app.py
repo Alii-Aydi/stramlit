@@ -112,15 +112,15 @@ st.markdown("""
 load_dotenv()
 
 # ── 3. Database Engine Setup ───────────────────────────────────────────────
-server = os.environ["AZURE_SQL_SERVER"]
-database = os.environ["AZURE_SQL_DATABASE"]
-username = os.environ["AZURE_SQL_USERNAME"]
-password = os.environ["AZURE_SQL_PASSWORD"]
-driver = os.environ["AZURE_SQL_DRIVER"].replace(" ", "+")
+s = st.secrets["azure_sql"]  # exact path for the TOML table
 
-# SQLAlchemy URL format for Azure SQL
+server = s["server"]
+database = s["database"]
+username = s["username"]
+password = s["password"]
+driver = s.get("driver", "ODBC Driver 17 for SQL Server").replace(" ", "+")
+
 connection_string = f"mssql+pyodbc://{username}:{password}@{server}:1433/{database}?driver={driver}&Encrypt=yes&TrustServerCertificate=no"
-
 engine = create_engine(connection_string)
 
 
